@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Music Streaming Service</title>
-    <link rel="stylesheet" type="text/css" href="{% static 'style.css' %}" />
+    <link rel="stylesheet" type="text/css" href="/static/style.css" />
 </head>
 <body style="margin:0; padding:0; background:#121212; font-family:Arial, sans-serif; color:#fff;">
     <div class="sidebar">
@@ -63,7 +63,7 @@
                 <!-- Artist Card -->
                 {% for artist in artists_info %}
                 <div class="artist-card">
-                    <a href="/profile/{{artist.2}}" style="text-decoration: none;">
+                    <a href="profile/{{artist.2}}" style="text-decoration: none;">
                         <img src="{{artist.1}}" alt="{{artist.0}}" style="width:150px; height:150px; border-radius:50%;">
                         <div class="artist-info">
                             <div class="artist-name">{{artist.0}}</div>

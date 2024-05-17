@@ -6,14 +6,79 @@ from django.contrib.auth.decorators import login_required
 import requests
 from bs4 import BeautifulSoup as bs
 import re
+import base64
+from requests import post
+import os
+import json
 
-# Create your views here.
+
+client_id = os.getenv("CLIENT_ID")
+client_secret = os.getenv("CLIENT_SECRET")
+
+# REDIRECT_URL = 'http://localhost:5000/callback'
+CLIENT_ID = '924e1569926f4375bc54723751e47df0'
+CLIENT_SECRET = 'fb413005b22d4b7b9d9974b2dc52659d'
+AUTH_URL = 'http://accounts.spotify.com/authorize'
+TOKEN_URL = 'http://accounts.spotify.com/api/token'
+API_BASE_URL = 'http://api.spotify.com/v1/'
+IMG_BASE_URL = 'https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228'
+# # Create your views here.
+# def get_token():
+#     auth_string = client_id + ":" + client_secret
+#     auth_bytes = auth_string.encode("utf-8")
+#     auth_base64 = str(base64.b64endcode(auth_bytes), "utf-8")
+
+#     url = "http:accounts.spotify.com/api/token"
+#     headers = {
+#         "Authorization": "Basic " + auth_base64,
+#         "Content-Type": "application/x-www-form-urlencoded"
+#     }
+
+#     data = {"grant_type": "client_credentials"}
+#     result = post(url, headers=headers, data=data)
+#     json_result = json.loads(result.content)
+#     token = json_result["access_token"]
+#     return token
+
+
+
+# def get_auth_header(token):
+#     return {"Authorization": "Bearer " + token}
+
+
+# token = get_token()
+# print(token)
+
+# from flask import Flask
+
+# app = Flask(__name__)
+# app.secret_key = 'fb413005b22d4b7b9d9974b2dc52659d'
+
+
+# HOME_URL = 'https://spotify-scraper.p.rapidapi.com/v1/home'
+
+import http.client
+
+# conn = http.client.HTTPSConnection("spotify-scraper.p.rapidapi.com")
+
+# headers = {
+#     'X-RapidAPI-Key': "d2566dd470msh8abb482a6ad0a89p1d7601jsn1719f7a50dd6",
+#     'X-RapidAPI-Host': "spotify-scraper.p.rapidapi.com"
+# }
+
+# conn.request("GET", "/v1/home", headers=headers)
+
+# res = conn.getresponse()
+# data = res.read()
+
+# print(data.decode("utf-8"))
+
 def top_artists():
-    url = "https://spotify-scraper.p.rapidapi.com/v1/chart/artists/top"
+    url = "https://spotify-scraper.p.rapidapi.com/v1/chart/tracks/top"
 
     headers = {
-        "X-RapidAPI-Key": "02912db996msh068b089c778126bp13a9d9jsn380afeb7d573",
-        "X-RapidAPI-Host": "spotify-scraper.p.rapidapi.com"
+        "X-RapidAPI-Key": "d2566dd470msh8abb482a6ad0a89p1d7601jsn1719f7a50dd6",
+	    "X-RapidAPI-Host": "spotify-scraper.p.rapidapi.com"
     }
 
     response = requests.get(url, headers=headers)
@@ -31,12 +96,14 @@ def top_artists():
 
     return artists_info
 
+
+
 def top_tracks():
-    url = "https://spotify-scraper.p.rapidapi.com/v1/chart/tracks/top"
+    url = "https://spotify-scraper.p.rapidapi.com/v1/chart/artists/top"
 
     headers = {
-        "X-RapidAPI-Key": "02912db996msh068b089c778126bp13a9d9jsn380afeb7d573",
-        "X-RapidAPI-Host": "spotify-scraper.p.rapidapi.com"
+        "X-RapidAPI-Key": "d2566dd470msh8abb482a6ad0a89p1d7601jsn1719f7a50dd6",
+	    "X-RapidAPI-Host": "spotify-scraper.p.rapidapi.com"
     }
 
     response = requests.get(url, headers=headers)
@@ -67,13 +134,13 @@ def top_tracks():
     return track_details
 
 def get_audio_etails(query):
-    url = "https://spotify-scraper.p.rapidapi.com/v1/track/download"
+    url = "https://spotify-scraper.p.rapidapi.com/v1/track/lyrics"
 
     querystring = {"track": query}
 
     headers = {
-        "X-RapidAPI-Key": "02912db996msh068b089c778126bp13a9d9jsn380afeb7d573",
-        "X-RapidAPI-Host": "spotify-scraper.p.rapidapi.com"
+        "X-RapidAPI-Key": "d2566dd470msh8abb482a6ad0a89p1d7601jsn1719f7a50dd6",
+	    "X-RapidAPI-Host": "spotify-scraper.p.rapidapi.com"
     }
 
     response = requests.get(url, headers=headers, params=querystring)
@@ -101,7 +168,7 @@ def get_audio_etails(query):
     return audio_details
 
 def get_track_image(track_id, track_name):
-    url = 'https://open.spotify.com/track/'+track_id
+    url = "https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228" + track_id
     r = requests.get(url)
     soup = bs(r.content)
     image_links_html = soup.find('img', {'alt': track_name})
@@ -127,7 +194,7 @@ def music(request, pk):
     querystring = {"trackId": track_id}
 
     headers = {
-        "X-RapidAPI-Key": "02912db996msh068b089c778126bp13a9d9jsn380afeb7d573",
+        "X-RapidAPI-Key": "d2566dd470msh8abb482a6ad0a89p1d7601jsn1719f7a50dd6",
         "X-RapidAPI-Host": "spotify-scraper.p.rapidapi.com"
     }
 
@@ -186,7 +253,7 @@ def search(request):
         querystring = {"term":search_query,"type":"track"}
 
         headers = {
-            "X-RapidAPI-Key": "02912db996msh068b089c778126bp13a9d9jsn380afeb7d573",
+            "X-RapidAPI-Key": "d2566dd470msh8abb482a6ad0a89p1d7601jsn1719f7a50dd6",
             "X-RapidAPI-Host": "spotify-scraper.p.rapidapi.com"
         }
 
@@ -209,7 +276,7 @@ def search(request):
                 if get_track_image(trackid, track_name):
                     track_image = get_track_image(trackid, track_name)
                 else:
-                    track_image = "https://imgv3.fotor.com/images/blog-richtext-image/music-of-the-spheres-album-cover.jpg"
+                    track_image = "https://i.scdn.co/image/ab67616d00001e02ff9ca10b55ce82ae553c8228",
 
                 track_list.append({
                     'track_name': track_name,
@@ -235,8 +302,8 @@ def profile(request, pk):
     querystring = {"artistId": artist_id}
 
     headers = {
-        "X-RapidAPI-Key": "02912db996msh068b089c778126bp13a9d9jsn380afeb7d573",
-        "X-RapidAPI-Host": "spotify-scraper.p.rapidapi.com"
+        "X-RapidAPI-Key': 'd2566dd470msh8abb482a6ad0a89p1d7601jsn1719f7a50dd6",
+        "X-RapidAPI-Host': 'spotify-scraper.p.rapidapi.com"
     }
 
     response = requests.get(url, headers=headers, params=querystring)
